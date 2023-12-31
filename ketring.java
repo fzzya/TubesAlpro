@@ -2,12 +2,16 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 class CateringSystem {
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "admin123";
+    private static String AdminUsername = "admin";
+    private static String AdminPassword = "admin";
+
+    private static String Username = "user";
+    private static String Password = "user";
 
     private static ArrayList<User> users = new ArrayList<>();
     private static ArrayList<Transaction> transactions = new ArrayList<>();
     private static ArrayList<MenuItem> menuItems = new ArrayList<>();
+    
     private static User currentUser;
 
     public static void main(String[] args) {
@@ -15,41 +19,176 @@ class CateringSystem {
         login();
 
         while (true) {
-            showMenu();
-            int choice = getChoice();
-
-            switch (choice) {
-                case 1:
-                    viewMenu();
-                    break;
-                case 2:
-                    placeOrder();
-                    break;
-                case 3:
-                    viewTransactions();
-                    break;
-                case 4:
-                    generateReports();
-                    break;
-                case 5:
-                    System.out.println("Terima kasih telah menggunakan aplikasi.");
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+            if (currentUser.getUsername().equals(AdminUsername)) {
+                menuAdmin();
+            } else {
+                menuUser();
             }
         }
     }
 
-    private static void initializeData() {
-        users.add(new User(ADMIN_USERNAME, ADMIN_PASSWORD));
+    private static void menuAdmin() {
+        System.out.println("\n=== Menu Admin ===");
+        System.out.println("1. Lihat Menu");
+        System.out.println("2. Tambah Menu");
+        System.out.println("3. Hapus Menu");
+        System.out.println("4. Lihat Laporan");
+        System.out.println("5. Login");
+        System.out.println("6. Keluar");
 
-        menuItems.add(new HeavyMeal("Paket Berat A", 30000));
-        menuItems.add(new HeavyMeal("Paket Berat B", 35000));
-        menuItems.add(new HeavyMeal("Paket Berat C", 40000));
-        menuItems.add(new LightMeal("Paket Ringan A", 15000));
-        menuItems.add(new LightMeal("Paket Ringan B", 20000));
-        menuItems.add(new LightMeal("Paket Ringan C", 25000));
+        int choice = getChoice();
+
+        switch (choice) {
+            case 1:
+                viewMenu();
+                break;
+            case 2:
+                addMenu();
+                break;
+            case 3:
+                deleteMenu();
+                break;
+            case 4:
+                generateReports();
+                break;
+            case 5 :
+                login();
+                break;
+            case 6:
+                System.out.println("Terima kasih telah menggunakan aplikasi.");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+        }
+    }
+
+    private static void menuUser() {
+        System.out.println("\n=== Menu User ===");
+        System.out.println("1. Lihat Menu");
+        System.out.println("2. Pesan Catering");
+        System.out.println("3. Lihat Struk Pemesanan");
+        System.out.println("4. Login");
+        System.out.println("5. Keluar");
+
+        int choice = getChoice();
+
+        switch (choice) {
+            case 1:
+                viewMenu();
+                break;
+            case 2:
+                placeOrder();
+                break;
+            case 3:
+                viewTransactions();
+                break;
+            case 4:
+                login();
+            case 5:
+                System.out.println("Terima kasih telah menggunakan aplikasi F2D Catering.");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+        }
+    }
+
+    private static void viewMenu() {
+        System.out.println("\n=== Menu Makanan Berat ===");
+        for (int i = 0; i < menuItems.size(); i++) {
+            if (menuItems.get(i) instanceof HeavyMeal) {
+                System.out.println((i + 1) + ". " + menuItems.get(i).getNama() + "\n   Isi : "
+                        + menuItems.get(i).getIsi() + "\n   Harga : Rp " + menuItems.get(i).getHarga());
+            }
+        }
+
+        System.out.println("\n=== Menu Makanan Ringan ===");
+        for (int j = 0; j < menuItems.size(); j++) {
+            if (menuItems.get(j) instanceof LightMeal) {
+                System.out.println((j +1) + ". " + menuItems.get(j).getNama() + "\n   Isi : "
+                        + menuItems.get(j).getIsi() + "\n   Harga : Rp " + menuItems.get(j).getHarga());
+            }
+        }
+    }
+
+    private static void addMenu() {
+        System.out.println("\n=== Menu Catering ===");
+        System.out.println("1. Makanan Berat");
+        System.out.println("2. Makanan Ringan");
+        int choice = getChoice();
+
+        switch (choice) {
+            case 1:
+                addHeavyMenuItem();
+                break;
+            case 2:
+                addLightMenuItem();
+                break;
+            default:
+                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+        }
+    }
+
+    private static void deleteMenu() {
+        Scanner scanner = new Scanner(System.in);
+        viewMenu();
+        System.out.print("Pilih nomor menu makanan yang ingin dihapus: ");
+        int menuNumber = scanner.nextInt();
+
+        if (menuNumber >= 1 && menuNumber <= menuItems.size()) {
+            if (menuItems.get(menuNumber - 1) instanceof HeavyMeal) {
+                menuItems.remove(menuNumber - 1);
+                System.out.println("Menu makanan berhasil dihapus.");
+            } else {
+                System.out.println("Nomor menu tidak valid.");
+            }
+        } else {
+            System.out.println("Nomor menu tidak valid.");
+        }
+    }
+
+
+
+    private static void addHeavyMenuItem() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Masukkan nama menu makanan berat: ");
+        String nama = scanner.nextLine();
+        System.out.print("Masukkan isi menu makanan berat: ");
+        String isi = scanner.nextLine();
+        System.out.print("Masukkan harga menu makanan berat: ");
+        int harga = scanner.nextInt();
+
+        menuItems.add(new HeavyMeal(nama, isi, harga));
+
+        System.out.println("Menu makanan berat berhasil ditambahkan.");
+    }
+
+    private static void addLightMenuItem() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Masukkan nama menu makanan ringan: ");
+        String nama = scanner.nextLine();
+        System.out.print("Masukkan isi menu makanan ringan: ");
+        String isi = scanner.nextLine();
+        System.out.print("Masukkan harga menu makanan ringan: ");
+        int harga = scanner.nextInt();
+
+        menuItems.add(new LightMeal(nama, isi, harga));
+
+        System.out.println("Menu makanan ringan berhasil ditambahkan.");
+    }
+
+    private static void initializeData() {
+        users.add(new User(AdminUsername, AdminPassword));
+        users.add(new User(Username, Password));
+
+        menuItems.add(new HeavyMeal("Paket Berat Lapar","Nasi, Ayam Lalapan", 30000));
+        menuItems.add(new HeavyMeal("Paket Berat Kenyang","Nasi, Bebek Lalapan ", 35000));
+        menuItems.add(new HeavyMeal("Paket Berat Begahh","Nasi, Rendang, & Sayur Singkong", 40000));
+        
+        menuItems.add(new LightMeal("Paket Ringan Kue", "Klepon & Kue Lapis", 15000));
+        menuItems.add(new LightMeal("Paket Ringan Gorengan","Onde-onde & Pastel",  20000));
+        menuItems.add(new LightMeal("Paket Ringan Campur",", Pie Buah", 25000));
     }
 
     private static void login() {
@@ -62,35 +201,19 @@ class CateringSystem {
         for (User user : users) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                 currentUser = user;
-                System.out.println("Login berhasil. Selamat datang, " + username + "!");
+                System.out.println("Login berhasil." + "\nSelamat Datang di F2D Catering, " + username + "! ^^");
                 return;
             }
         }
 
         System.out.println("Login gagal. Silakan coba lagi.");
-        System.exit(0);
-    }
-
-    private static void showMenu() {
-        System.out.println("\n=== Menu ===");
-        System.out.println("1. Lihat Menu");
-        System.out.println("2. Pesan Catering");
-        System.out.println("3. Lihat Transaksi");
-        System.out.println("4. Lihat Laporan");
-        System.out.println("5. Keluar");
+        
     }
 
     private static int getChoice() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Masukkan pilihan Anda: ");
         return scanner.nextInt();
-    }
-
-    private static void viewMenu() {
-        System.out.println("\n=== Menu Catering ===");
-        for (int i = 0; i < menuItems.size(); i++) {
-            System.out.println((i + 1) + ". " + menuItems.get(i).getName() + " - Rp " + menuItems.get(i).getPrice());
-        }
     }
 
     private static void placeOrder() {
@@ -110,7 +233,7 @@ class CateringSystem {
 
             //TRAMBAHKAAN TOTAL HARGA
             System.out.println(transaction);
-            System.out.println("Pesanan Anda telah berhasil ditempatkan.");
+            System.out.println("Pesanan Berhasil Dibuat.");
         } else {
             System.out.println("Nomor menu tidak valid.");
         }
@@ -137,11 +260,10 @@ class CateringSystem {
                 for (Transaction transaction : transactions) {
                     if (transaction.getItem() == menuItem) {
                         totalSold += transaction.getQuantity();
-                        totalRevenue += transaction.getQuantity() * menuItem.getPrice();
+                        totalRevenue += transaction.getQuantity() * menuItem.getHarga();
                     }
                 }
-
-                System.out.println(menuItem.getName() + ": Terjual " + totalSold + " paket, Total Pendapatan: Rp " + totalRevenue);
+                System.out.println(menuItem.getNama() + ": Terjual " + totalSold + " paket, Total Pendapatan: Rp " + totalRevenue);
             }
         }
 
@@ -155,11 +277,11 @@ class CateringSystem {
                 for (Transaction transaction : transactions) {
                     if (transaction.getItem() == menuItem) {
                         totalSold += transaction.getQuantity();
-                        totalRevenue += transaction.getQuantity() * menuItem.getPrice();
+                        totalRevenue += transaction.getQuantity() * menuItem.getHarga();
                     }
                 }
 
-                System.out.println(menuItem.getName() + ": Terjual " + totalSold + " paket, Total Pendapatan: Rp " + totalRevenue);
+                System.out.println(menuItem.getNama() + ": Terjual " + totalSold + " paket, Total Pendapatan: Rp " + totalRevenue);
             }
         }
     }
@@ -184,32 +306,38 @@ class User {
 }
 
 abstract class MenuItem {
-    private String name;
-    private int price;
+    private String nama, isi;
+    private int harga;
+    
 
-    public MenuItem(String name, int price) {
-        this.name = name;
-        this.price = price;
+    public MenuItem(String nama, String isi, int harga) {
+        this.nama = nama;
+        this.isi = isi;
+        this.harga = harga;
     }
 
-    public String getName() {
-        return name;
+    public String getNama() {
+        return nama;
     }
 
-    public int getPrice() {
-        return price;
+    public String getIsi() {
+        return isi;
+    }
+
+    public int getHarga() {
+        return harga;
     }
 }
 
 class HeavyMeal extends MenuItem {
-    public HeavyMeal(String name, int price) {
-        super(name, price);
+    public HeavyMeal(String nama,String isi, int harga) {
+        super(nama,isi, harga);
     }
 }
 
 class LightMeal extends MenuItem {
-    public LightMeal(String name, int price) {
-        super(name, price);
+    public LightMeal(String nama, String isi, int harga) {
+        super(nama, isi,  harga);
     }
 }
 
@@ -217,6 +345,7 @@ class Transaction {
     private User user;
     private MenuItem item;
     private int quantity;
+    private int total;
 
     public Transaction(User user, MenuItem item, int quantity) {
         this.user = user;
@@ -238,6 +367,6 @@ class Transaction {
 
     @Override
     public String toString() {
-        return user.getUsername() + " - " + quantity + "x " + item.getName() + " - Rp " + item.getPrice() * quantity;
+        return user.getUsername() + " - " + quantity + "x " + item.getNama() + item.getIsi() + " - Rp " + item.getHarga() * quantity;
     }
 }
